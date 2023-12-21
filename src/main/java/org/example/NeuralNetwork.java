@@ -1,6 +1,6 @@
 package org.example;
-
-import java.util.ArrayList;
+import java.io.*;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -57,6 +57,32 @@ public class NeuralNetwork {
                     }
                 }
             }
+        }
+    }
+
+    // Speichert die Gewichte in einer Datei
+    public void saveWeights(String filename) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(filename))) {
+            for (int i = 0; i < weights.length; i++) {
+                for (int j = 0; j < weights[i].length; j++) {
+                    writer.println(weights[i][j]);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Lädt die Gewichte aus einer Datei
+    public void loadWeights(String filename) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            for (int i = 0; i < weights.length; i++) {
+                for (int j = 0; j < weights[i].length; j++) {
+                    weights[i][j] = Double.parseDouble(reader.readLine());
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

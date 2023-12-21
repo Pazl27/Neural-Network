@@ -10,40 +10,40 @@ public class Main {
         // Normalize data
         DataNormalizer.normalizeData(dataList);
 
-        int inputSize = 8; // Number of features in your dataset
-        int hiddenSize = 4; // Number of neurons in the hidden layer
+        int inputSize = 7; // Number of features in your dataset
+        int hiddenSize = 7; // Number of neurons in the hidden layer
         int outputSize = 1; // Number of output neurons (1 for binary classification)
 
-        double learningRate = 0.01;
+        double learningRate = 0.5; // Adjust the learning rate
         NeuralNetwork neuralNetwork = new NeuralNetwork(inputSize, hiddenSize, outputSize, learningRate);
 
-        int epochs = 1000; // Set the number of epochs
-        neuralNetwork.train(dataList, epochs);
+        int epochs = 100000; // Increase the number of epochs
 
-        // Test the trained network and provide feedback
-        testNetwork(neuralNetwork, dataList);
-    }
+        // Debug-Ausgaben während des Trainings
+        for (int epoch = 0; epoch < epochs; epoch++) {
+            double totalError = 0.0;
+            for (double[] dataRow : dataList) {
+                double[] input = new double[dataRow.length - 1];
+                System.arraycopy(dataRow, 0, input, 0, dataRow.length - 1);
 
-    private static void testNetwork(NeuralNetwork neuralNetwork, List<double[]> dataList) {
-        int correctPredictions = 0;
+                double[] output = neuralNetwork.predict(input);
+                double target = dataRow[dataRow.length - 1];
 
-        for (double[] dataRow : dataList) {
-            double[] input = new double[dataRow.length - 1];
-            System.arraycopy(dataRow, 0, input, 0, dataRow.length - 1);
+                double error = target - output[0];
+                totalError += 0.5 * Math.pow(error, 2);
 
-            double[] output = neuralNetwork.predict(input);
-            double predictedValue = output[0];
-            double actualValue = dataRow[dataRow.length - 1];
-
-            System.out.println("Prediction: " + predictedValue + ", Actual: " + actualValue);
-
-            // Check if the prediction is correct (you might need to adjust the threshold based on your problem)
-            if ((predictedValue >= 0.5 && actualValue == 1) || (predictedValue < 0.5 && actualValue == 0)) {
-                correctPredictions++;
+                // Debug-Ausgaben
+                System.out.println("Epoch: " + epoch + ", Error: " + totalError + ", Prediction: " + output[0] + ", Target: " + target);
             }
         }
 
-        double accuracy = (double) correctPredictions / dataList.size();
-        System.out.println("Accuracy: " + accuracy);
+        // Nach dem Training: Gewichte speichern
+        neuralNetwork.saveWeights("trained_weights.txt");
+
+        // Beim Start des Programms: Gewichte laden
+        neuralNetwork.loadWeights("trained_weights.txt");
+
+        // Test the trained network and provide feedback
+        EvaluationMetrics.evaluate(neuralNetwork, dataList);
     }
 }
